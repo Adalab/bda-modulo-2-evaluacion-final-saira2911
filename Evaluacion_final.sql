@@ -136,13 +136,41 @@ HAVING `average length` > 120;
 
 -- 21. Encuentra los actores que han actuado en al menos 5 películas y muestra el nombre del actor junto con la cantidad 
 -- de películas en las que han actuado.
+SELECT `first_name`, `last_name`, COUNT(`film_id`) AS `movies number`
+	FROM `actor`
+INNER JOIN `film_actor`
+	USING(`actor_id`)
+GROUP BY `actor_id`
+HAVING COUNT(`film_id`) >= 5;
 
 -- 22. Encuentra el título de todas las películas que fueron alquiladas por más de 5 días. Utiliza una subconsulta 
 -- para encontrar los rental_ids con una duración superior a 5 días y luego selecciona las películas correspondientes.
+SELECT DISTINCT `title`
+	FROM `film`
+INNER JOIN `inventory`
+USING (`film_id`)
+INNER JOIN `rental`
+USING (`inventory_id`)
+WHERE `rental_id` IN (SELECT `rental_id`
+							FROM `rental`
+						WHERE (DATEDIFF(DATE(`return_date`), DATE(`rental_date`))) > 5);
 
 -- 23. Encuentra el nombre y apellido de los actores que no han actuado en ninguna película de la categoría "Horror". 
 -- Utiliza una subconsulta para encontrar los actores que han actuado en películas de la categoría "Horror" y 
 -- luego exclúyelos de la lista de actores.
+
+SELECT `first_name`, `last_name`
+	FROM `actor`
+WHERE `actor_id` NOT IN (SELECT `actor_id`
+							FROM `film_actor`
+						INNER JOIN `film`
+							USING (`film_id`)
+						WHERE `film_id` IN (SELECT `film_id`
+												FROM `film_category`
+											WHERE `category_id` IN (SELECT `category_id`
+																		FROM `category`
+																	WHERE `name` = 'Horror'))
+
 
 ## BONUS
 
