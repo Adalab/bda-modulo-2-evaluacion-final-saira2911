@@ -105,10 +105,10 @@ WHERE `release_year` BETWEEN 2005 AND 2010; -- solo hay peliculas de 2006 en la 
 SELECT `title`
 	FROM `film`
 WHERE `film_id` IN (SELECT `film_id` -- subquery encontrar peliculas de categoria family
-						FROM `film_category`
-					WHERE `category_id` = (SELECT `category_id` -- subquery encontrar id correspondiente a family
-												FROM `category`
-											WHERE `name` = 'Family'));
+				FROM `film_category`
+			WHERE `category_id` = (SELECT `category_id` -- subquery encontrar id correspondiente a family
+							FROM `category`
+						WHERE `name` = 'Family'));
 	
 -- 18. Muestra el nombre y apellido de los actores que aparecen en más de 10 películas.
 SELECT `first_name`, `last_name`
@@ -152,8 +152,8 @@ INNER JOIN `inventory`
 INNER JOIN `rental`
 	USING (`inventory_id`)
 WHERE `rental_id` IN (SELECT `rental_id` -- subquery para econtrar los alquileres que han durado mas de 5 dias
-							FROM `rental`
-						WHERE (DATEDIFF(DATE(`return_date`), DATE(`rental_date`))) > 5);
+				FROM `rental`
+			WHERE (DATEDIFF(DATE(`return_date`), DATE(`rental_date`))) > 5);
 
 -- 23. Encuentra el nombre y apellido de los actores que no han actuado en ninguna película de la categoría "Horror". 
 -- Utiliza una subconsulta para encontrar los actores que han actuado en películas de la categoría "Horror" y 
@@ -162,14 +162,14 @@ WHERE `rental_id` IN (SELECT `rental_id` -- subquery para econtrar los alquilere
 SELECT `first_name`, `last_name`
 	FROM `actor`
 WHERE `actor_id` NOT IN (SELECT `actor_id` -- actores que han participado en peliculas de horror
-							FROM `film_actor`
-						INNER JOIN `film`
-							USING (`film_id`)
-						WHERE `film_id` IN (SELECT `film_id` -- peliculas de categoria horror
-												FROM `film_category`
-											WHERE `category_id` IN (SELECT `category_id` -- subquery encontrar id correspondiente a horror
-																		FROM `category`
-																	WHERE `name` = 'Horror')));
+				FROM `film_actor`
+			INNER JOIN `film`
+				USING (`film_id`)
+			WHERE `film_id` IN (SELECT `film_id` -- peliculas de categoria horror
+							FROM `film_category`
+						WHERE `category_id` IN (SELECT `category_id` -- subquery encontrar id correspondiente a horror
+										FROM `category`
+									WHERE `name` = 'Horror')));
 
 
 ## BONUS
@@ -179,18 +179,18 @@ WHERE `actor_id` NOT IN (SELECT `actor_id` -- actores que han participado en pel
 SELECT `title`
 	FROM `film`
 WHERE `length` > 180 AND `film_id` IN (SELECT `film_id` -- peliculas de categoria comedia
-											FROM `film_category`
-										WHERE `category_id` = (SELECT `category_id` -- subquery encontrar id correspondiente a comedia
-																	FROM `category`
-																WHERE `name` = 'Comedy'));
+						FROM `film_category`
+					WHERE `category_id` = (SELECT `category_id` -- subquery encontrar id correspondiente a comedia
+									FROM `category`
+								WHERE `name` = 'Comedy'));
 
 -- 25. BONUS: Encuentra todos los actores que han actuado juntos en al menos una película. La consulta debe mostrar 
 -- el nombre y apellido de los actores y el número de películas en las que han actuado juntos.
 
 WITH `actor2` AS (SELECT CONCAT(`first_name`, ' ', `last_name`) AS `name2`, `film_id`
-						FROM `actor`
-					INNER JOIN `film_actor`
-						USING (`actor_id`))
+			FROM `actor`
+		INNER JOIN `film_actor`
+			USING (`actor_id`))
 
 SELECT CONCAT(`A`.`first_name`, ' ', `A`.`last_name`) AS `name1`, `name2`, COUNT(`film_actor`.`film_id`) AS `movies number`
 	FROM `actor` AS `A`
