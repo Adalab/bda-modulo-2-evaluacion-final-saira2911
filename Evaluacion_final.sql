@@ -104,9 +104,9 @@ WHERE `release_year` BETWEEN 2005 AND 2010; -- solo hay peliculas de 2006 en la 
 -- 17. Encuentra el título de todas las películas que son de la misma categoría que "Family".
 SELECT `title`
 	FROM `film`
-WHERE `film_id` IN (SELECT `film_id`
+WHERE `film_id` IN (SELECT `film_id` -- subquery encontrar peliculas de categoria family
 						FROM `film_category`
-					WHERE `category_id` = (SELECT `category_id`
+					WHERE `category_id` = (SELECT `category_id` -- subquery encontrar id correspondiente a family
 												FROM `category`
 											WHERE `name` = 'Family'));
 	
@@ -151,7 +151,7 @@ INNER JOIN `inventory`
 	USING (`film_id`)
 INNER JOIN `rental`
 	USING (`inventory_id`)
-WHERE `rental_id` IN (SELECT `rental_id`
+WHERE `rental_id` IN (SELECT `rental_id` -- subquery para econtrar los alquileres que han durado mas de 5 dias
 							FROM `rental`
 						WHERE (DATEDIFF(DATE(`return_date`), DATE(`rental_date`))) > 5);
 
@@ -161,13 +161,13 @@ WHERE `rental_id` IN (SELECT `rental_id`
 
 SELECT `first_name`, `last_name`
 	FROM `actor`
-WHERE `actor_id` NOT IN (SELECT `actor_id`
+WHERE `actor_id` NOT IN (SELECT `actor_id` -- actores que han participado en peliculas de horror
 							FROM `film_actor`
 						INNER JOIN `film`
 							USING (`film_id`)
-						WHERE `film_id` IN (SELECT `film_id`
+						WHERE `film_id` IN (SELECT `film_id` -- peliculas de categoria horror
 												FROM `film_category`
-											WHERE `category_id` IN (SELECT `category_id`
+											WHERE `category_id` IN (SELECT `category_id` -- subquery encontrar id correspondiente a horror
 																		FROM `category`
 																	WHERE `name` = 'Horror')));
 
@@ -178,9 +178,9 @@ WHERE `actor_id` NOT IN (SELECT `actor_id`
 -- tabla `film`.
 SELECT `title`
 	FROM `film`
-WHERE `length` > 180 AND `film_id` IN (SELECT `film_id`
+WHERE `length` > 180 AND `film_id` IN (SELECT `film_id` -- peliculas de categoria comedia
 											FROM `film_category`
-										WHERE `category_id` = (SELECT `category_id`
+										WHERE `category_id` = (SELECT `category_id` -- subquery encontrar id correspondiente a comedia
 																	FROM `category`
 																WHERE `name` = 'Comedy'));
 
@@ -192,7 +192,7 @@ WITH `actor2` AS (SELECT CONCAT(`first_name`, ' ', `last_name`) AS `name2`, `fil
 					INNER JOIN `film_actor`
 						USING (`actor_id`))
 
-SELECT CONCAT(`A`.`first_name`, ' ', `A`.`last_name`) AS `name1`, COUNT(`film_actor`.`film_id`) AS `movies number`
+SELECT CONCAT(`A`.`first_name`, ' ', `A`.`last_name`) AS `name1`, `name2`, COUNT(`film_actor`.`film_id`) AS `movies number`
 	FROM `actor` AS `A`
 INNER JOIN `film_actor`
 	USING (`actor_id`)
@@ -200,9 +200,9 @@ INNER JOIN `actor2`
 	USING (`film_id`)
 GROUP BY `name1`, `name2`
 	HAVING `name1` <> `name2`
-	AND `film_actor`.`film_id` = `actor2`.`film_id`
+	AND `film_actor`.`film_id` = `actor2`.`film_id` 
 
-CONCAT(`A`.`first_name`, ' ', `A`.`last_name`) <> CONCAT(`first_name`, ' ', `last_name`)
+
 
 
 
