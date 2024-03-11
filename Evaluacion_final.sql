@@ -148,9 +148,9 @@ HAVING COUNT(`film_id`) >= 5;
 SELECT DISTINCT `title`
 	FROM `film`
 INNER JOIN `inventory`
-USING (`film_id`)
+	USING (`film_id`)
 INNER JOIN `rental`
-USING (`inventory_id`)
+	USING (`inventory_id`)
 WHERE `rental_id` IN (SELECT `rental_id`
 							FROM `rental`
 						WHERE (DATEDIFF(DATE(`return_date`), DATE(`rental_date`))) > 5);
@@ -169,13 +169,40 @@ WHERE `actor_id` NOT IN (SELECT `actor_id`
 												FROM `film_category`
 											WHERE `category_id` IN (SELECT `category_id`
 																		FROM `category`
-																	WHERE `name` = 'Horror'))
+																	WHERE `name` = 'Horror')));
 
 
 ## BONUS
 
 -- 24. BONUS: Encuentra el título de las películas que son comedias y tienen una duración mayor a 180 minutos en la 
 -- tabla `film`.
+SELECT `title`
+	FROM `film`
+WHERE `length` > 180 AND `film_id` IN (SELECT `film_id`
+											FROM `film_category`
+										WHERE `category_id` = (SELECT `category_id`
+																	FROM `category`
+																WHERE `name` = 'Comedy'));
 
 -- 25. BONUS: Encuentra todos los actores que han actuado juntos en al menos una película. La consulta debe mostrar 
 -- el nombre y apellido de los actores y el número de películas en las que han actuado juntos.
+
+WITH `actor2` AS (SELECT CONCAT(`first_name`, ' ', `last_name`) AS `name2`, `film_id`
+						FROM `actor`
+					INNER JOIN `film_actor`
+						USING (`actor_id`))
+
+SELECT CONCAT(`A`.`first_name`, ' ', `A`.`last_name`) AS `name1`, COUNT(`film_actor`.`film_id`) AS `movies number`
+	FROM `actor` AS `A`
+INNER JOIN `film_actor`
+	USING (`actor_id`)
+INNER JOIN `actor2`
+	USING (`film_id`)
+GROUP BY `name1`, `name2`
+	HAVING `name1` <> `name2`
+	AND `film_actor`.`film_id` = `actor2`.`film_id`
+
+CONCAT(`A`.`first_name`, ' ', `A`.`last_name`) <> CONCAT(`first_name`, ' ', `last_name`)
+
+
+
