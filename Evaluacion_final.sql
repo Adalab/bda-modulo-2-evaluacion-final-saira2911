@@ -96,17 +96,43 @@ LEFT JOIN `film_actor` -- hacemos left join para coger TODOS los actores
 	USING (`actor_id`)
 WHERE `film_id` IS NULL;
 
-
 -- 16. Encuentra el título de todas las películas que fueron lanzadas entre el año 2005 y 2010.
+SELECT `title`
+	FROM `film`
+WHERE `release_year` BETWEEN 2005 AND 2010; -- solo hay peliculas de 2006 en la tabla film
 
 -- 17. Encuentra el título de todas las películas que son de la misma categoría que "Family".
-
+SELECT `title`
+	FROM `film`
+WHERE `film_id` IN (SELECT `film_id`
+						FROM `film_category`
+					WHERE `category_id` = (SELECT `category_id`
+												FROM `category`
+											WHERE `name` = 'Family'));
+	
 -- 18. Muestra el nombre y apellido de los actores que aparecen en más de 10 películas.
+SELECT `first_name`, `last_name`
+	FROM `actor`
+INNER JOIN `film_actor`
+	USING(`actor_id`)
+GROUP BY `actor_id` -- intente hacer el group by por nombre y apellido y me sale 1 fila menos que al hacerlo por id, significa que hay 2 actores con el mismo nombre y apellido?
+HAVING COUNT(`film_id`) > 10;
 
 -- 19. Encuentra el título de todas las películas que son "R" y tienen una duración mayor a 2 horas en la tabla `film`.
+SELECT `title`
+	FROM `film`
+WHERE `rating` = 'R' AND `length` > 120;
 
 -- 20. Encuentra las categorías de películas que tienen un promedio de duración superior a 120 minutos y muestra el nombre 
 -- de la categoría junto con el promedio de duración.
+SELECT AVG(`length`) AS `average length`, `name` AS `category`
+	FROM `film`
+INNER JOIN `film_category`
+	USING (`film_id`)
+INNER JOIN `category`
+	USING (`category_id`)
+GROUP BY `category`
+HAVING `average length` > 120;
 
 -- 21. Encuentra los actores que han actuado en al menos 5 películas y muestra el nombre del actor junto con la cantidad 
 -- de películas en las que han actuado.
